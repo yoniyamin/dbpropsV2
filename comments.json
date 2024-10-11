@@ -1,0 +1,23 @@
+{
+    "asmUsePLSQLArray": [
+        "Use PL/SQL Array for ASM file reading",
+        "With this, we do one call to ASM and do 50 local read calls (still regular dbms_diskgroup.read) to fill a pl/SQL array"
+    ],
+    "readAheadBlocks": [
+        "In Older versions the default is 100k."
+    ],
+    "supportResetLog": [
+        "When the customer is unable to grant access to V$DATABASE_INCARNATION (understanding we wouldn\u2019t be able to support reset log operations), setting it to false can suppress the test."
+    ],
+    "traceDdlChanges": [
+        "Unique to Oracle, and allows to write all the DDL\u2019s that are occurring on the source to the task log. ",
+        "When this option is enabled, all DDL\u2019s will be captured and written to the log. That includes DDL\u2019s that are outside of the scope of the task.",
+        "test"
+    ],
+    "capturedRacThreads": [
+        "This parameter should be used when for some reason one of the RAC threads was retired and shouldn\u2019t be used \u2013 the threads should be comma-delimited."
+    ],
+    "checkArchivedRedoIntervalInSeconds": [
+        "Check for Archived Redo Interval in Seconds"
+    ]
+}
