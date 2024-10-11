@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replicate Internal Parameters List</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+    <style>
+        .highlighted-param {
+            background-color: #f0e68c;
+        }
+        .search-bar {
+            width: 50%;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            padding: 10px;
+            border: 1px solid #00b140;
+            background-color: #f7f7f7;
+        }
+        .matches-found {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #00b140;
+            text-align: center;
+        }
+        .search-icons img {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Replicate Internal Parameters List</h1>
+
+        <form action="/" method="post" class="form-inline mb-4">
+            <div class="form-group">
+                <label for="dbid" class="mr-2">Database:</label>
+                <select name="dbid" id="dbid" class="form-control mr-2">
+                    {% for db in db_metadata %}
+                    <option value="{{ db.id }}" {% if db.id == selected_dbid %}selected{% endif %}>{{ db.title }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary ml-2" type="submit">Filter</button>
+            </div>
+        </form>
+
+        {% if syntax %}
+        <h3 class="mb-4">Syntax: {{ syntax }}</h3>
+        {% endif %}
+
+        <!-- Search bar -->
+        <div class="d-flex align-items-center">
+            <input type="text" id="paramSearch" class="form-control search-bar" onkeyup="filterParams()" placeholder="Search for parameters...">
+        </div>
+
+        <!-- Matches found section -->
+        <div id="matchIndicatorContainer" class="matches-found"></div>
+
+        <div class="accordion" id="parameterAccordion">
+
+        <!-- Parameter Sections: Source, Target, Other, and Unparsed Parameters -->
+{% for section, params, section_id, section_title in [
+    ('source_params', source_params, 'sectionSource', 'Source Parameters'),
+    ('target_params', target_params, 'sectionTarget', 'Target Parameters'),
+    ('other_params', other_params, 'sectionOther', 'Other Parameters'),
+    ('unparsed_params', unparsed_params, 'sectionUnparsed', 'Unparsed Parameters')
+] %}
+    {% if params %}
+    <div class="card param-section" id="{{ section_id }}" data-title="{{ section_title }}">
+        <div class="card-header" id="heading{{ section_id }}">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse{{ section_id }}" aria-expanded="false" aria-controls="collapse{{ section_id }}">
+                    {{ section_title }}
+                </button>
+            </h5>
+        </div>
+        <div id="collapse{{ section_id }}" class="collapse" aria-labelledby="heading{{ section_id }}" data-parent="#parameterAccordion">
+            <div class="card-body">
+                <ul class="list-group sourceTargetList">
+                    {% for param_dict in params %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ param_dict.name }}</strong> - {{ param_dict.ui_name }}
+                                {% if comments[param_dict.name] %}
+                                <p><em>Comments:</em></p>
+                                <ul>
+                                    {% for comment in comments[param_dict.name] %}
+                                    <li>{{ comment }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                            <div class="search-icons">
+                                <a href="https://www.google.com/search?q={{ param_dict.name }}+Qlik+Replicate" target="_blank">
+                                    <img src="/static/icons8-google-48.png" alt="Google" width="24">
+                                </a>
+                                <a href="https://community.qlik.com/t5/Search-the-Community/bd-p/qlikSearchUnify?searchString={{ param_dict.name }}&activeType=all&from=0&sortby=_score&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22boardName%22%2C%22filter%22%3A%22Qlik%2520Replicate%22%5D%7D%5D" target="_blank">
+                                    <img src="/static/qlik.48.png" alt="Qlik Community" width="24">
+                                </a>
+                                <button id="{{ section }}Expand{{ loop.index }}" class="btn btn-link" type="button" onclick="toggleExpand('{{ section }}Expand{{ loop.index }}', '{{ section }}Param{{ loop.index }}')" aria-expanded="false" aria-controls="{{ section }}Param{{ loop.index }}">
+                                    Expand
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Comment Section (Displayed next to the name/description) -->
+                        {% if comment_mode %}
+                        <form action="/add_comment" method="post" class="mt-2">
+                            <input type="hidden" name="param_name" value="{{ param_dict.name }}">
+                            <div class="form-group d-flex">
+                                <textarea class="form-control mr-2" name="comment" placeholder="Add Comment..." rows="1"></textarea>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                        {% endif %}
+
+                        <!-- Expandable details section -->
+                        <div id="{{ section }}Param{{ loop.index }}" class="collapse">
+                            <ul>
+                                {% for key, value in param_dict.items() %}
+                                    {% if key != "name" and key != "item_id" and key != "level" %}
+                                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Search and expand/collapse logic -->
+    <script>
+        // Function to filter parameters by name or ui_name and highlight the matches
+        function filterParams() {
+            try {
+                const input = document.getElementById('paramSearch');
+                const filter = input.value.toUpperCase();
+                const sections = document.querySelectorAll('.param-section');
+                const matchesFound = [];
+
+                sections.forEach(section => {
+                    const listItems = section.querySelectorAll('.list-group-item');
+                    const matchedItems = [];
+                    const unmatchedItems = [];
+
+                    listItems.forEach(item => {
+                        const txtValue = item.textContent || item.innerText;
+                        const matches = txtValue.toUpperCase().includes(filter);
+
+                        // When the search field is cleared, reset everything
+                        if (filter === '') {
+                            item.classList.remove('highlighted-param');
+                            matchedItems.push(item); // Treat all as matched when filter is cleared
+                        } else {
+                            if (matches) {
+                                item.classList.add('highlighted-param'); // Highlight matching items
+                                matchedItems.push(item); // Collect matched items
+                            } else {
+                                item.classList.remove('highlighted-param');
+                                unmatchedItems.push(item); // Collect unmatched items
+                            }
+                        }
+                    });
+
+                    // Clear the list and re-add the matched items at the top, followed by unmatched items
+                    const listGroup = section.querySelector('.list-group');
+                    listGroup.innerHTML = '';
+
+                    matchedItems.forEach(item => listGroup.appendChild(item));
+                    unmatchedItems.forEach(item => listGroup.appendChild(item));
+
+                    // If there are matches, add to the matchesFound list for display
+                    if (matchedItems.length > 0 && filter !== '') {
+                        const sectionTitle = section.getAttribute('data-title');
+                        const sectionId = section.id;
+                        matchesFound.push(`<a href="#${sectionId}" onclick="expandSection('${sectionId}')">${sectionTitle}</a>`);
+                    }
+                });
+
+                // Display the "Matches found in" message with clickable links
+                const matchIndicator = document.getElementById('matchIndicatorContainer');
+                if (matchesFound.length > 0) {
+                    matchIndicator.innerHTML = `Matches found in ${matchesFound.join(' | ')}`;
+                } else {
+                    matchIndicator.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error in filterParams:', error);
+            }
+        }
+
+        // Function to expand the section when a match is clicked
+        function expandSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const collapseElement = section.querySelector('.collapse');
+
+            if (collapseElement && !collapseElement.classList.contains('show')) {
+                collapseElement.classList.add('show');
+            }
+
+            // Scroll to the section smoothly
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function to manually expand/collapse parameters
+        function toggleExpand(buttonId, collapseId) {
+            try {
+                const expandButton = document.getElementById(buttonId);
+                const collapseElement = document.getElementById(collapseId);
+
+                if (!expandButton || !collapseElement) {
+                    console.error('Required elements not found');
+                    return;
+                }
+
+                const isExpanded = collapseElement.classList.contains('show');
+                collapseElement.classList.toggle('show');
+                expandButton.setAttribute('aria-expanded', (!isExpanded).toString());
+            } catch (error) {
+                console.error('Error in toggleExpand:', error);
+            }
+        }
+        // When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    var goTopBtn = document.getElementById("goTopBtn");
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        goTopBtn.style.display = "block";
+    } else {
+        goTopBtn.style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function goToTop() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+}
+    </script>
+    <!-- Go to Top Button -->
+    <button onclick="scrollToTop()" id="goTopBtn" class="btn btn-success">Top</button>
+
+</body>
+</html>
