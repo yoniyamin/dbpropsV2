@@ -96,7 +96,7 @@
                                 <a href="https://www.google.com/search?q={{ param_dict.name }}+Qlik+Replicate" target="_blank">
                                     <img src="/static/icons8-google-48.png" alt="Google" width="24">
                                 </a>
-                                <a href="https://community.qlik.com/t5/Search-the-Community/bd-p/qlikSearchUnify?searchString={{ param_dict.name }}&activeType=all&from=0&sortby=_score&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22boardName%22%2C%22filter%22%3A%22Qlik%2520Replicate%22%5D%7D%5D" target="_blank">
+                                <a href="https://community.qlik.com/t5/Search-the-Community/bd-p/qlikSearchUnify?searchString={{ param_dict.name }}&activeType=all&from=0&sortby=_score&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22Product_category_flat%22%2C%22filter%22%3A%5B%22Qlik+Replicate%22%5D%7D%5D&uid=cb43fd48-5178-11eb-8a9b-0242ac120002&resultsPerPage=10&exactPhrase=&withOneOrMore=&withoutTheWords=&pageSize=10&language=en&state=12&suCaseCreate=false" target="_blank">
                                     <img src="/static/qlik.48.png" alt="Qlik Community" width="24">
                                 </a>
                                 <button id="{{ section }}Expand{{ loop.index }}" class="btn btn-link" type="button" onclick="toggleExpand('{{ section }}Expand{{ loop.index }}', '{{ section }}Param{{ loop.index }}')" aria-expanded="false" aria-controls="{{ section }}Param{{ loop.index }}">
@@ -234,6 +234,23 @@
                 console.error('Error in toggleExpand:', error);
             }
         }
+        // When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    var goTopBtn = document.getElementById("goTopBtn");
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        goTopBtn.style.display = "block";
+    } else {
+        goTopBtn.style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function goToTop() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+}
     </script>
     <!-- Go to Top Button -->
     <button onclick="scrollToTop()" id="goTopBtn" class="btn btn-success">Top</button>
