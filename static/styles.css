@@ -4,6 +4,17 @@ body {
     background-color: #e8f5e9;
 }
 
+.container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: left;
+}
+
 h1 {
     color: #00b140;
 }
@@ -26,6 +37,7 @@ h1 {
     text-align: center;
     margin-top: 10px;
 }
+
 #goTopBtn {
     position: fixed;
     bottom: 20px;

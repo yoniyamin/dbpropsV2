@@ -6,28 +6,6 @@
     <title>Replicate Internal Parameters List</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/styles.css" rel="stylesheet">
-    <style>
-        .highlighted-param {
-            background-color: #f0e68c;
-        }
-        .search-bar {
-            width: 50%;
-            margin-bottom: 20px;
-            border-radius: 25px;
-            padding: 10px;
-            border: 1px solid #00b140;
-            background-color: #f7f7f7;
-        }
-        .matches-found {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #00b140;
-            text-align: center;
-        }
-        .search-icons img {
-            margin-left: 10px;
-        }
-    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -96,7 +74,7 @@
                                 <a href="https://www.google.com/search?q={{ param_dict.name }}+Qlik+Replicate" target="_blank">
                                     <img src="/static/icons8-google-48.png" alt="Google" width="24">
                                 </a>
-                                <a href="https://community.qlik.com/t5/Search-the-Community/bd-p/qlikSearchUnify?searchString={{ param_dict.name }}&activeType=all&from=0&sortby=_score&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22Product_category_flat%22%2C%22filter%22%3A%5B%22Qlik+Replicate%22%5D%7D%5D&uid=cb43fd48-5178-11eb-8a9b-0242ac120002&resultsPerPage=10&exactPhrase=&withOneOrMore=&withoutTheWords=&pageSize=10&language=en&state=12&suCaseCreate=false" target="_blank">
+                                <a href="https://community.qlik.com/t5/Search-the-Community/bd-p/qlikSearchUnify?searchString={{ param_dict.name }}&activeType=all&from=0&sortby=_score&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22boardName%22%2C%22filter%22%3A%22Qlik+Replicate%22%5D%7D%5D" target="_blank">
                                     <img src="/static/qlik.48.png" alt="Qlik Community" width="24">
                                 </a>
                                 <button id="{{ section }}Expand{{ loop.index }}" class="btn btn-link" type="button" onclick="toggleExpand('{{ section }}Expand{{ loop.index }}', '{{ section }}Param{{ loop.index }}')" aria-expanded="false" aria-controls="{{ section }}Param{{ loop.index }}">
@@ -138,12 +116,31 @@
 
         </div>
     </div>
+    <!-- Go to Top Button -->
+    <button onclick="goToTop()" id="goTopBtn" class="btn btn-success">Top</button>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Search and expand/collapse logic -->
     <script>
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            var goTopBtn = document.getElementById("goTopBtn");
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                goTopBtn.style.display = "block"; // Show the button when scrolled
+            } else {
+                goTopBtn.style.display = "none";  // Hide the button at the top
+            }
+        }
+
+        // Scroll to the top when the user clicks the button
+        function goToTop() {
+            window.scrollTo({top: 0, behavior: 'smooth'}); // Smooth scroll to top
+        }
+
         // Function to filter parameters by name or ui_name and highlight the matches
         function filterParams() {
             try {
@@ -234,26 +231,8 @@
                 console.error('Error in toggleExpand:', error);
             }
         }
-        // When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function() {scrollFunction()};
 
-function scrollFunction() {
-    var goTopBtn = document.getElementById("goTopBtn");
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        goTopBtn.style.display = "block";
-    } else {
-        goTopBtn.style.display = "none";
-    }
-}
-
-// When the user clicks on the button, scroll to the top of the document
-function goToTop() {
-    document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
-}
     </script>
-    <!-- Go to Top Button -->
-    <button onclick="scrollToTop()" id="goTopBtn" class="btn btn-success">Top</button>
 
 </body>
 </html>
